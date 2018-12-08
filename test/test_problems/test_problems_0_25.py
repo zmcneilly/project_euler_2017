@@ -79,7 +79,7 @@ class TestProblem4(TestCase):
 
             results = []
             for pal in gen_palindromes(pal_len):
-                for i in range(10 ** (n - 1), 10 ** (n)):
+                for i in range(10 ** (n - 1), 10 ** n):
                     j = pal / i
                     if j.is_integer() and len(str(int(j))) == n:
                         results.append(pal)
@@ -135,7 +135,6 @@ class TestProblem7(TestCase):
     def test_problem_7(self):
         def func(n: int) -> int:
             primes = Primes()
-            result = 0
             i = 0
             for p in primes:
                 i += 1
@@ -195,6 +194,7 @@ class TestProblem9(TestCase):
                 if i ** 2 + j ** 2 == k ** 2:
                     print(i * j * k)
                     return
+
 
 class TestProblem10(TestCase):
 
