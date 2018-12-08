@@ -10,11 +10,9 @@ def prime_factors(n: int) -> list:
     max_factor = math.ceil(math.sqrt(n))
     primes.is_prime(max_factor)
 
-    for x in range(3, max_factor+1, 2):
+    for x in primes:
         if x > max_factor:
             break
-        if x == 1 or not primes.is_prime(x):
-            continue
         if n % x == 0:
             results.append(x)
 
