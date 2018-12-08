@@ -233,7 +233,3 @@ class TestProblem9(TestCase):
                 if i ** 2 + j ** 2 == k ** 2:
                     print(i * j * k)
                     return
-
-
-
-
