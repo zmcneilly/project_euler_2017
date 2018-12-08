@@ -21,6 +21,18 @@ class Primes(object):
             if self.is_prime(x):
                 yield x
 
+    def sum_below(self, n: int) -> int:
+        """
+        Return the sum of the primes below n.
+        """
+        sum = 0
+        self._generate_prime_array(n)
+        for prime in self:
+            if prime > n:
+                break
+            sum += prime
+        return sum
+
     def load_cache(self) -> None:
         """
         Load cache from disk, if available.

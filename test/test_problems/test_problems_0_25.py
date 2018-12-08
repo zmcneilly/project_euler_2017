@@ -199,4 +199,7 @@ class TestProblem9(TestCase):
 class TestProblem10(TestCase):
 
     def test_problem_10(self):
-        pass
+        primes = Primes()
+
+        self.assertEqual(primes.sum_below(10), 17)
+        print(primes.sum_below(2000000))
