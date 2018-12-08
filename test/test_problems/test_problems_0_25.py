@@ -1,58 +1,20 @@
 import math
 
+from src.factorization import prime_factors, multiples
+from src.fibonacci import fibonacci_sequence
 from src.primes import Primes
 from textwrap import dedent
 from unittest import TestCase
-
-
-def fibonacci_sequence(n: int) -> list:
-    """
-    Return a list of the fibonacci sequence, with all values <= n.
-
-    :return: A list of ints.
-    :rtype: list[int]
-    """
-
-    sequence = [1, 2]
-    while sequence[-1] <= n:
-        index = len(sequence)
-        sequence.append(sequence[index - 1] + sequence[index - 2])
-    while sequence[-1] > n:
-        sequence.pop()
-    return sequence
-
-
-def prime_factors(n: int) -> list:
-    primes = Primes()
-    results = [2] if n % 2 == 0 else []
-    max_factor = math.ceil(math.sqrt(n))
-    primes.is_prime(max_factor)
-
-    for x in primes:
-        if x > max_factor:
-            break
-        if n % x == 0:
-            results.append(x)
-
-    return results
 
 
 class TestProblem1(TestCase):
 
     def test_problem_1(self):
 
-        def natural_numbers(n: int, m: int) -> list:
-            """
-            Return a list of natural numbers, less than m, and multiples of n.
-
-            :return: A list of natural numbers.
-            """
-            return [n*x for x in range(0, math.ceil(m/n))]
-
         def func(n: list, m: int) -> int:
             results = set()
             for _n in n:
-                results.update(natural_numbers(_n, m))
+                results.update(multiples(_n, m))
             return sum(results)
 
         self.assertEqual(func([3, 5], 10), 23)
@@ -233,3 +195,8 @@ class TestProblem9(TestCase):
                 if i ** 2 + j ** 2 == k ** 2:
                     print(i * j * k)
                     return
+
+class TestProblem10(TestCase):
+
+    def test_problem_10(self):
+        pass
