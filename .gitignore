@@ -1,3 +1,6 @@
+# Project Euler Additions
+test/test_problems/prime_cache
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
