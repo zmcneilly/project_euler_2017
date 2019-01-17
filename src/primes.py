@@ -17,9 +17,21 @@ class Primes(object):
         self.load_cache()
 
     def __iter__(self):
+        yield 2
+        for x in range(3, self.max_prime + 1, 2):
+            if self.prime_array[x]:
+                yield x
+
+    def __getitem__(self, item):
+        if item == 0:
+            return 1
+
+        count = int(item)
         for x in range(2, self.max_prime + 1):
             if self.is_prime(x):
-                yield x
+                count -= 1
+            if count == 0:
+                return x
 
     def sum_below(self, n: int) -> int:
         """
