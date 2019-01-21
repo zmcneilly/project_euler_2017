@@ -1,4 +1,7 @@
 import math
+import re
+
+from typing import Tuple
 
 from src.factorization import prime_factors, multiples, num_divisors, divisors
 from src.fibonacci import fibonacci_sequence
@@ -6,6 +9,52 @@ from src.primes import Primes
 from textwrap import dedent
 from unittest import TestCase
 
+
+class Point(object):
+    def __init__(self, x: int, y: int):
+        self.x, self.y = x, y
+
+    def __str__(self):
+        return "{}".format(self.position)
+
+    def __eq__(self, other):
+        return self.position == other.position
+
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        return Point(abs(self.x - other.x), abs(self.y - other.y))
+
+    def __gt__(self, other):
+        return self.x > other.x and self.y > other.y
+
+    def __lt__(self, other):
+        return self.x < other.x and self.y < other.y
+
+    def __le__(self, other):
+        return self.x <= other.x and self.y <= other.y
+
+    def __ge__(self, other):
+        return self.x >= other.x and self.y >= other.y
+
+    @property
+    def position(self) -> Tuple[int, int]:
+        return (self.x, self.y)
+
+    @property
+    def right(self):
+        return Point(self.x + 1, self.y)
+
+    @property
+    def down(self):
+        return Point(self.x, self.y + 1)
+
+
+class Node(Point):
+    def __init__(self, x, y, value=0):
+        self.value = 0
+        super(Point, self).__init__(x, y)
 
 class Collatz(object):
     def __init__(self):
@@ -455,11 +504,77 @@ class TestProblem14(TestCase):
             self.assertEqual(837799, max_n)
 
 
+class TestProblem15(TestCase):
+    def central_binomial_coef(self, n: int) -> int:
+        return (math.factorial(2 * n)/(math.factorial(n)) ** 2)
 
 
+    def test_num_paths(self):
+        self.assertEqual(self.central_binomial_coef(2), 6)
+
+    def test_problem_15(self):
+        self.assertAlmostEqual(137846528820, self.central_binomial_coef(20))
 
 
+class TestProblem16(TestCase):
+    def test_problem_16(self):
+        x_str = "{}".format(2 ** 15)
+        self.assertEqual(26, sum([int(x) for x in x_str]))
+        x_str = "{}".format(2 ** 1000)
+        self.assertEqual(1366, sum([int(x) for x in x_str]))
 
+
+class TestProblems17(TestCase):
+    pattern = re.compile("\w")
+    single_digits = {
+        1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+        6: "six", 7: "seven", 8: "eight", 9: "nine", 0: ""
+    }
+    teen_digits = {
+        10: "ten", 11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen",
+        16: "sixteen", 17: "seventeen", 18: "eighteen", 19: "nineteen",
+    }
+    second_digits = {
+        2: "twenty", 3: "thirty", 4: "forty", 5: "fifty", 6: "sixty", 7: "seventy",
+        8: "eighty", 9: "ninety", 0: "hundred"
+    }
+
+    def num_alphabetic(self, test_str: str) -> int:
+        try:
+            results = len(self.pattern.findall(test_str))
+        finally:
+            return results
+
+    def long_form(self, n) -> str:
+        if n in self.teen_digits:
+            return self.teen_digits[n]
+        elif n in self.single_digits:
+            return self.single_digits[n]
+        n_str = "{}".format(n)
+        if len(n_str) == 2:
+            return self.second_digits[int(n_str[0])] + self.single_digits[int(n_str[1])]
+        if len(n_str) == 3:
+            results = self.single_digits[int(n_str[0])] + "hundred"
+            if int(n_str[1:]) > 0:
+                results += "and" + self.long_form(int(n_str[1:]))
+            return results
+        if len(n_str) == 4:
+            results = self.single_digits[int(n_str[0])] + "thousand"
+            if int(n_str[1:]) > 0:
+                results += "and" + self.long_form(int(n_str[1:]))
+            return results
+
+    def num_long_form(self, n: int) -> int:
+        _l = self.long_form(n)
+        _c = self.num_alphabetic(_l)
+        return _c
+
+    def test_problem_17(self):
+        self.assertEqual(19, sum([self.num_long_form(n) for n in range(1, 6)]))
+        self.assertEqual(23, self.num_long_form(342))
+        self.assertEqual(20, self.num_long_form(115))
+        result = sum([self.num_long_form(n) for n in range(1, 1001)])
+        self.assertEqual(21124, result)
 
 
 
