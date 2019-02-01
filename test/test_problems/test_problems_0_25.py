@@ -708,5 +708,5 @@ class TestProblem19(TestCase):
 
 class TestProblem20(TestCase):
     def test_problem_20(self):
-        self.assertEqual(-1, sum([int(x) for x in str(math.factorial(100))]))
+        self.assertEqual(648, sum([int(x) for x in str(math.factorial(100))]))
 
