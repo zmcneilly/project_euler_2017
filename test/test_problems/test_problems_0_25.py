@@ -1,7 +1,9 @@
+import datetime
 import math
 import re
 
 from typing import Tuple
+from hashlib import sha1
 
 from src.factorization import prime_factors, multiples, num_divisors, divisors
 from src.fibonacci import fibonacci_sequence
@@ -53,8 +55,36 @@ class Point(object):
 
 class Node(Point):
     def __init__(self, x, y, value=0):
-        self.value = 0
-        super(Point, self).__init__(x, y)
+        self.value = value
+        self.parents = set()
+        super(Node, self).__init__(x, y)
+
+    def __hash__(self):
+        return sha1("{}.{}".format(self.position, self.value).encode("utf-8")).hexdigest().__hash__()
+
+    def __gt__(self, other):
+        return self.value > other.value
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __le__(self, other):
+        return self.value <= other.value
+
+    def __ge__(self, other):
+        return self.value >= other.value
+
+    def add_parent(self, parent) -> None:
+        if len(self.parents) == 2:
+            raise ValueError("Already have maximum number of parents")
+        self.parents.add(parent)
+
+    def max_sum(self) -> int:
+        max_sum = self.value
+        for _p in self.parents:
+            max_sum = max(self.value + _p.max_sum(), max_sum)
+        return max_sum
+
 
 class Collatz(object):
     def __init__(self):
@@ -577,6 +607,106 @@ class TestProblems17(TestCase):
         self.assertEqual(21124, result)
 
 
+class TestProblems18_Naive(TestCase):
+    def setUp(self):
+        self.triangle = []
+        self.triangle_str = dedent("""
+                                        75
+                                        95 64
+                                        17 47 82
+                                        18 35 87 10
+                                        20 04 82 47 65
+                                        19 01 23 75 03 34
+                                        88 02 77 73 07 63 67
+                                        99 65 04 28 06 16 70 92
+                                        41 41 26 56 83 40 80 70 33
+                                        41 48 72 33 47 32 37 16 94 29
+                                        53 71 44 65 25 43 91 52 97 51 14
+                                        70 11 33 28 77 73 17 78 39 68 17 57
+                                        91 71 52 38 17 14 91 43 58 50 27 29 48
+                                        63 66 04 68 89 53 67 30 73 16 69 87 40 31
+                                        04 62 98 27 23 09 70 98 73 93 38 53 60 04 23""").strip()
+        row = 0
+        for line in self.triangle_str.split("\n"):
+            col = 0
+            row_list = []
+            for value in line.split(" "):
+                n = Node(row, col, int(value))
+                if row > 0:
+                    try:
+                        n.add_parent(self.triangle[row - 1][col])
+                    except IndexError:
+                        pass
+                    try:
+                        n.add_parent(self.triangle[row - 1][col - 1])
+                    except IndexError:
+                        pass
+                row_list.append(n)
+                col += 1
+            self.triangle.append(row_list)
+            row += 1
+
+    def test_problem_18(self):
+        max_sum = 0
+        for n in self.triangle[-1]:
+            max_sum = max(n.max_sum(), max_sum)
+        self.assertEqual(1074, max_sum)
 
 
+class TestProblems18(TestCase):
+    def setUp(self):
+        self.triangle = []
+        self.triangle_str = dedent("""
+                                        75
+                                        95 64
+                                        17 47 82
+                                        18 35 87 10
+                                        20 04 82 47 65
+                                        19 01 23 75 03 34
+                                        88 02 77 73 07 63 67
+                                        99 65 04 28 06 16 70 92
+                                        41 41 26 56 83 40 80 70 33
+                                        41 48 72 33 47 32 37 16 94 29
+                                        53 71 44 65 25 43 91 52 97 51 14
+                                        70 11 33 28 77 73 17 78 39 68 17 57
+                                        91 71 52 38 17 14 91 43 58 50 27 29 48
+                                        63 66 04 68 89 53 67 30 73 16 69 87 40 31
+                                        04 62 98 27 23 09 70 98 73 93 38 53 60 04 23""").strip()
+
+        row_pos = 0
+        for row in self.triangle_str.split("\n"):
+            col_pos = 0
+            self.triangle.append([])
+            for col in row.split(" "):
+                value = int(col)
+                if row_pos > 0:
+                    max_parent = 0
+                    starting_pos = col_pos - 1 if col_pos > 0 else 0
+                    ending_pos = min(col_pos + 1, len(self.triangle[row_pos - 1]))
+                    for parent_value in self.triangle[row_pos - 1][starting_pos:ending_pos]:
+                        max_parent = max(max_parent, parent_value)
+                    value += max_parent
+                self.triangle[row_pos].append(value)
+                col_pos += 1
+            row_pos += 1
+                # Only store greatest sum
+
+    def test_problem_18(self):
+        self.assertEqual(1074, max(self.triangle[len(self.triangle) - 1]))
+
+
+class TestProblem19(TestCase):
+    def test_problem_19(self):
+        start_date = datetime.datetime(year=1901, month=1, day=1)
+        end_date = datetime.datetime(year=2000, month=12, day=31)
+        duration = 0
+        while start_date < end_date:
+            start_date = start_date + datetime.timedelta(days=1)
+            duration += 1 if start_date.day == 1 and start_date.isoweekday() == 7 else 0
+        self.assertEqual(171, duration)
+
+
+class TestProblem20(TestCase):
+    def test_problem_20(self):
+        self.assertEqual(-1, sum([int(x) for x in str(math.factorial(100))]))
 
